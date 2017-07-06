@@ -65,12 +65,14 @@ class Model():
                     # dE/dOut
                     dEdOut = layer_output - Y
                     last_dE = dEdOut
+                # print("Pred: ", pred)
+                # print("Y: ", Y)
                 # print("dE/dOut: ", dEdOut)
 
                 # Calculate dOut/dNet
                 activation_layer = components[current_component_index + 1]
                 dOutdNet = activation_layer.d_feed(activation_layer.getOutput())
-                # print("dOut/dNet: ", dOutdNet)
+                print("dOut/dNet: ", dOutdNet)
                 if dOutdNet.all() == 0:
                     raise ValueError('Warning: Activation appears to be oversaturated - Consider normalizing input data')
 
@@ -81,9 +83,13 @@ class Model():
                     dNetdW = np.insert(dNetdW, 0, 1, axis=1)
                 else:
                     dNetdW = components[current_component_index-1].getOutput()
+                    # Augment for the size of the neurons
+                    blank = np.ones((current_component.getShape()[1], dNetdW.shape[1]))
+                    dNetdW = np.multiply(blank, dNetdW)
                     # Add Bias
                     dNetdW = np.insert(dNetdW, 0, 1, axis=1)
-                # print("dNet/dW: ", dNetdW)
+                    dNetdW = dNetdW.T
+                print("dNet/dW: ", dNetdW)
                 
                 if current_component_index + 2 < len(components):
                     prev_weights = last_weights
@@ -92,13 +98,13 @@ class Model():
                     # print("new dEdOut: ", dEdOut)
 
                 delta = np.multiply(dEdOut, dOutdNet)
-                # print("Delta: ", delta)
+                print("Delta: ", delta)
                 # dEdW = np.multiply(delta, dNetdW)
-                dEdW = np.multiply(dNetdW.T, delta)
-                # print("dE/dw: ", dEdW)
+                dEdW = np.multiply(dNetdW, delta)
+                print("dE/dw: ", dEdW)
                 last_weights = current_component.getWeights()
                 # Update Weights
-                current_component.updateWeights(dEdW, self.lr)
+                current_component.updateWeights(dEdW.T, self.lr)
                 last_delta = delta
                 # print("Updated Weights: ", current_component.getWeights())
                 # print("delta: ", last_delta)
@@ -162,10 +168,13 @@ class Layer():
         X = np.insert(X, 0, biases, axis=1)
         # Error checking
         if X.shape[1] != self.W.shape[0]:
-            raise ValueError("Wrong input shape")
+            # raise ValueError("Wrong input shape")
+            pass
         # Remember Last Output
-        last_output_no_bias = X * self.W
-        self.last_output = X * self.W
+
+        # last_output_no_bias = X * self.W
+        self.last_output = np.dot(X, self.W)
+        # self.last_output = X * self.W
 
         
         # Multiply
@@ -183,8 +192,11 @@ class Layer():
         
     def updateWeights(self, X, lr):
         # Adjust Weights by a value
-        self.W = self.W - np.multiply(lr, X)
-        pass
+        print("X: ", X)
+        modifier = np.sum(-1 * np.multiply(lr, X), axis=1)
+        print("Modifier: ", modifier)
+        newW = self.W + modifier
+        self.W = newW
     
     def getOutput(self):
         return self.last_output

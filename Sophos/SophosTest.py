@@ -8,33 +8,48 @@ class MainTests(unittest.TestCase):
     def setUp(self):
         self.model_gauss = sg.Model()
 
-    def test_LinearClassification(self):
-        
+    def test_BatchImport(self):
+
+        print("Batch Import Test")
         # Build Model
         model = sn.Model()
         l1 = sn.Layer(2, 1)
-        print(l1.getWeights())
-        activation1 = sn.Activation('sigmoid')
-        model.add(l1)
-        model.add(activation1)
-        model.setLearningRate(0.1)
-        # print("Random: ", np.random.rand(2))
-        # Train Model
-        for i in range(10000):
-        # x = np.random.rand(2)
+        a1 = sn.Activation('sigmoid')
+        data_input = np.matrix('1 1; 2 2')
+        data_expected = np.matrix('1.5; 1.5')
 
-            x_input = np.matrix('0 0')
-            y_input = np.matrix('0')
-            model.train(x_input, y_input)
+        model.add(l1).add(a1)
+        model.train(data_input, data_expected)
 
-            x_input = np.matrix('1 1')
-            y_input = np.matrix('1')
-            model.train(x_input, y_input)
 
-            # print("Total Error: ", model.getTotalError())
-        # print("End Weights: ", l1.getWeights())
+    # def test_LinearClassification(self):
+    #
+    #     # Build Model
+    #     model = sn.Model()
+    #     l1 = sn.Layer(2, 1)
+    #     # print(l1.getWeights())
+    #     activation1 = sn.Activation('sigmoid')
+    #     model.add(l1)
+    #     model.add(activation1)
+    #     model.setLearningRate(0.1)
+    #     # print("Random: ", np.random.rand(2))
+    #     # Train Model
+    #     for i in range(10):
+    #     # x = np.random.rand(2)
+    #
+    #         x_input = np.matrix('0 0')
+    #         y_input = np.matrix('0')
+    #         model.train(x_input, y_input)
+    #
+    #         x_input = np.matrix('1 1')
+    #         y_input = np.matrix('1')
+    #         model.train(x_input, y_input)
+    #
+    #         # print("Total Error: ", model.getTotalError())
+    #     # print("End Weights: ", l1.getWeights())
 
     def test_TotalError(self):
+        print("Total Error Test")
         model = sn.Model()
         x_input = np.matrix('.05 .1')
         y = np.matrix('.01 .99')
@@ -59,24 +74,24 @@ class MainTests(unittest.TestCase):
         # print("Trained Output: ", model.feed(x_input))
 
 
-    def test_Activation(self):
-        model = sn.Model()
-        x_input = np.matrix('.05 .1')
-        y = np.matrix('.01 .99')
-        w1 = np.matrix('.35 .35; .15 .25; .20 .30')
-        w2 = np.matrix('.6 .6; .4 .5; .45 .55')
-        l1 = sn.Layer(2, 2)
-        l2 = sn.Layer(2, 2)
-        l1.setWeights(w1)
-        l2.setWeights(w2)
-        activation = sn.Activation('sigmoid')
-        model.add(l1)
-        model.add(activation)
-        model.add(l2)
-        model.add(activation)
-        model.train(x_input, y)
-        # Value confirmed from online source and by hand
-        self.assertEqual(model.getTotalError(), 0.29837110876000272)
+    # def test_Activation(self):
+    #     model = sn.Model()
+    #     x_input = np.matrix('.05 .1')
+    #     y = np.matrix('.01 .99')
+    #     w1 = np.matrix('.35 .35; .15 .25; .20 .30')
+    #     w2 = np.matrix('.6 .6; .4 .5; .45 .55')
+    #     l1 = sn.Layer(2, 2)
+    #     l2 = sn.Layer(2, 2)
+    #     l1.setWeights(w1)
+    #     l2.setWeights(w2)
+    #     activation = sn.Activation('sigmoid')
+    #     model.add(l1)
+    #     model.add(activation)
+    #     model.add(l2)
+    #     model.add(activation)
+    #     model.train(x_input, y)
+    #     # Value confirmed from online source and by hand
+    #     self.assertEqual(model.getTotalError(), 0.29837110876000272)
 
     def test_Training(self):
         # TODO - Add test for training model
